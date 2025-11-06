@@ -63,75 +63,7 @@ pipeline {
             }
         }
 
-        stage("7. Configure Prometheus & Grafana") {
-            steps {
-                script {
-                    sh """
-                    export KUBECONFIG=${KUBE_CONFIG}
-
-                    helm repo add stable https://charts.helm.sh/stable || true
-                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
-                    helm repo update
-
-                    # Create namespace if missing
-                    if ! kubectl get namespace monitoring > /dev/null 2>&1; then
-                        kubectl create namespace monitoring
-                    fi
-
-                    # Install Prometheus + Grafana via kube-prometheus-stack
-                    if ! helm status kube-prom-stack -n monitoring > /dev/null 2>&1; then
-                        helm install kube-prom-stack prometheus-community/kube-prometheus-stack \
-                            -n monitoring \
-                            --set grafana.enabled=true \
-                            --set grafana.service.type=NodePort \
-                            --set grafana.adminPassword='admin123'
-                    fi
-                    """
-                }
-            }
-        }
-
-        stage("8. Configure ArgoCD") {
-            steps {
-                script {
-                    sh """
-                    export KUBECONFIG=${KUBE_CONFIG}
-
-                    # Create namespace if missing
-                    if ! kubectl get namespace argocd > /dev/null 2>&1; then
-                        kubectl create namespace argocd
-                    fi
-
-                    # Install ArgoCD only if server deployment does not exist
-                    if ! kubectl get deploy argocd-server -n argocd > /dev/null 2>&1; then
-                        kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-                    fi
-                    """
-                }
-            }
-        }
-
-        stage("9. Install Nginx Ingress Controller") {
-            steps {
-                script {
-                    sh """
-                    export KUBECONFIG=${KUBE_CONFIG}
-
-                    # Create ingress namespace
-                    if ! kubectl get namespace ingress-nginx > /dev/null 2>&1; then
-                        kubectl create namespace ingress-nginx
-                    fi
-
-                    # Install Nginx ingress if missing
-                    if ! helm status ingress-nginx -n ingress-nginx > /dev/null 2>&1; then
-                        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx || true
-                        helm repo update
-                        helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx
-                    fi
-                    """
-                }
-            }
-        }
+        
 
         stage('10. Deploy Application & Ingress') {
             steps {
@@ -149,13 +81,11 @@ pipeline {
     fi
 
     kubectl apply -f $WORKSPACE/k8s_files/deployment.yaml -n $NAMESPACE
-    kubectl apply -f $WORKSPACE/k8s_files/service.yaml -n $NAMESPACE
+    kubectl apply -f $WORKSPACE/k8s_files/prime-svc.yaml -n $NAMESPACE
 
     kubectl rollout restart deployment amazon-prime -n $NAMESPACE
 
-    if [ -f $WORKSPACE/k8s_files/ingress.yaml ]; then
-        kubectl apply -f $WORKSPACE/k8s_files/ingress.yaml
-    fi
+    
 '''
 
                 }
