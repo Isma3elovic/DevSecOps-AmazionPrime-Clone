@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,7 +16,6 @@ spec:
     spec:
       containers:
       - name: amazon-prime
-        image: isma3elovic:prime
+        image: isma3elovic/prime:latest
         ports:
         - containerPort: 3000
-...
