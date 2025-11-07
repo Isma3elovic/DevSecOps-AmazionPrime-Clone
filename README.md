@@ -1,4 +1,3 @@
-Markdown
 
 # 🎬 Amazon Prime Clone Deployment Project
 
