@@ -161,6 +161,12 @@ Generate SonarQube Token:
 
     Save it for Jenkins integration.
 
+Configure Jenkins Webhook (Crucial for Quality Gate)
+
+Create a new webhook in SonarQube to notify Jenkins when the analysis is complete and the Quality Gate status is available. Since both are running as Docker containers defined in the same docker-compose.yml, use the Jenkins service name (jenkins) and its exposed port (9000) for internal communication.
+
+    Webhook URL: http://jenkins:9000/sonarqube-webhook/ (The trailing slash is mandatory for the Jenkins plugin.)    
+
 🤖 Jenkins Configuration
 
 1️⃣ Add Jenkins Credentials
