@@ -33,43 +33,43 @@ sudo apt install docker.io -y
 sudo systemctl enable docker
 sudo systemctl start docker
 docker --version
-
+```
 🧩 Docker Compose
 
 Bash
-
+```
 sudo apt install docker-compose -y
 docker-compose --version
-
+```
 🧠 Git
 
 Bash
-
+```
 sudo apt install git -y
 git --version
-
+```
 💻 Visual Studio Code (optional)
 
 Bash
-
+```
 sudo snap install code --classic
-
+```
 🏗️ Infrastructure Setup Using Docker Compose
 
 1️⃣ Clone the Repository
 
 Bash
-
+```
 git clone [https://github.com/Isma3elovic/DevSecOps-AmazionPrime-Clone.git](https://github.com/Isma3elovic/DevSecOps-AmazionPrime-Clone.git)
 cd DevSecOps-AmazionPrime-Clone
 code .   # optional: open project in VS Code
-
+```
 2️⃣ Run Docker Containers
 
 Bash
-
+```
 docker-compose up -d
-
+```
 This command launches containers for Jenkins and SonarQube.
 
 3️⃣ Configure Jenkins Container for CI/CD Tools
@@ -79,32 +79,33 @@ Access the Jenkins container as the root user to install the necessary command-l
 A. Access the Jenkins Container
 
 Bash
-
+```
 docker exec -u 0 -it <JENKINS_CONTAINER_ID> bash
-
+```
 B. Install Trivy (Security Scanner)
 
 Run these commands inside the container:
 Bash
-
+```
 apt update
 apt install -y wget apt-transport-https gnupg lsb-release
 wget -qO - [https://aquasecurity.github.io/trivy-repo/deb/public.key](https://aquasecurity.github.io/trivy-repo/deb/public.key) | gpg --dearmor -o /usr/share/keyrings/trivy.gpg
 echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] [https://aquasecurity.github.io/trivy-repo/deb](https://aquasecurity.github.io/trivy-repo/deb) $(lsb_release -sc) main" > /etc/apt/sources.list.d/trivy.list
 apt update 
 apt install -y trivy
-
+```
 C. Install Docker CLI
 
 Run these commands inside the container:
 Bash
-
+```
 apt-get update -y
 apt-get install -y ca-certificates curl gnupg
 curl -fsSL [https://download.docker.com/linux/ubuntu/gpg](https://download.docker.com/linux/ubuntu/gpg) -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
-
+```
 # Add the repository to Apt sources:
+```
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
@@ -112,38 +113,38 @@ echo \
 
 apt-get update -y
 apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-
+```
 D. Install Helm
 
 Run these commands inside the container:
 Bash
-
+```
 apt-get update && apt-get install -y curl apt-transport-https 
 curl [https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3](https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3) | bash
-
+```
 E. Configure Docker Access and Permissions
 
 Run these commands inside the container:
 Bash
-
+```
 usermod -aG docker ubuntu
 chmod 777 /var/run/docker.sock 
-
+```
 F. Setup Minikube/Kubernetes Configuration
 
 Run these commands on your Host Machine (outside the container):
 
     Connect Networks (Host):
     Bash
-
+```
 docker network connect minikube <JENKINS_CONTAINER_ID>
-
+```
 Copy Kubeconfig (Host):
 Bash
-
+```
     docker exec -it <JENKINS_CONTAINER_ID> mkdir -p /var/jenkins_home/.kube
     docker cp ~/.kube/config <JENKINS_CONTAINER_ID>:/var/jenkins_home/.kube/config
-
+```
 🔍 SonarQube Configuration
 
 Login Credentials:
@@ -186,13 +187,13 @@ Go to Manage Jenkins → Plugins and install:
 
 In Manage Jenkins → Global Tool Configuration, set up:
 
-    JDK 17 (Name: JDK)
+    JDK 17  (Name: JDK)
 
-    NodeJS (Name: NodeJS)
+    NodeJS 16.20.0 (Name: NodeJS)
 
     SonarQube Scanner (Name: SonarQube Scanner)
 
-    Docker
+    Docker latest
 
 🚀 CI/CD Pipeline Overview
 
@@ -212,7 +213,7 @@ In Manage Jenkins → Global Tool Configuration, set up:
 
     Push to DockerHub → Push image to registry
 
-    
+    Deploy in minikube cluster
 
 🚢 Continuous Deployment with ArgoCD
 
