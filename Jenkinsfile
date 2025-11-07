@@ -65,7 +65,7 @@ pipeline {
 
         
 
-        stage('10. Deploy Application & Ingress') {
+        stage('7. Deploy Application & Ingress') {
             steps {
                 script{
                 sh '''           
