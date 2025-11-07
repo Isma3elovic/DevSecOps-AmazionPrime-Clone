@@ -25,10 +25,9 @@ This project demonstrates deploying an Amazon Prime clone using a set of DevOps 
    ```
 2. **Initialize and Apply docker containers**:
    - Run the below commands 
-   -   ```
-       `docker-compose up -d`
-     ```
-
+       ```
+       docker-compose up
+       ``` 
 This will create the docker containers for jenkins and sonarqube.
 
 ## SonarQube Configuration
