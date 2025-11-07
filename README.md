@@ -1,75 +1,146 @@
-# Amazon Prime Clone Deployment Project
+# 🎬 Amazon Prime Clone Deployment Project
 
-## Project Overview
-This project demonstrates deploying an Amazon Prime clone using a set of DevOps tools and practices. The primary tools include:
+## 📘 Project Overview
 
-- **GitHub**: Source code management.
-- **Jenkins**: CI/CD automation tool.
-- **SonarQube**: Code quality analysis and quality gate tool.
-- **NPM**: Build tool for NodeJS.
-- **Aqua Trivy**: Security vulnerability scanner.
-- **Docker**: Containerization tool to create images.
-- **DockerHub**: Repository to store Docker images.
-- **Minikube**: Container management platform.
-- **ArgoCD**: Continuous deployment tool.
-- **Prometheus & Grafana**: Monitoring and alerting tools.
+This project demonstrates the deployment of an **Amazon Prime Clone** using a modern **DevOps CI/CD pipeline**.
+It showcases the integration of automation, security, and monitoring tools for end-to-end deployment.
 
+### 🧰 Tools Used
 
+* **GitHub** → Source code management
+* **Jenkins** → Continuous Integration & Continuous Deployment (CI/CD)
+* **SonarQube** → Static code analysis and quality gate enforcement
+* **NPM** → NodeJS dependency and build management
+* **Aqua Trivy** → Security vulnerability scanning
+* **Docker** → Application containerization
+* **DockerHub** → Image registry for Docker images
+* **Minikube** → Local Kubernetes cluster for app deployment
+* **ArgoCD** → GitOps-based Continuous Deployment
+* **Prometheus & Grafana** → Monitoring and alerting stack
 
-## Infrastructure Setup Using docker compose
-1. **Clone the Repository** (Open Command Prompt & run below):
-   ```bash
-   git clone https://github.com/Isma3elovic/DevSecOps-AmazionPrime-Clone.git
-   cd DevSecOps-AmazionPrime-Clone
-   code .   # this command will open VS code in backend
-   ```
-2. **Initialize and Apply docker containers**:
-   - Run the below commands 
-       ```
-       docker-compose up
-       ``` 
-This will create the docker containers for jenkins and sonarqube.
+---
 
-## SonarQube Configuration
-1. **Login Credentials**: Use `admin` for both username and password.
-2. **Generate SonarQube Token**:
-   - Create a token under `Administration → Security → Users → Tokens`.
-   - Save the token for integration with Jenkins.
+## ⚙️ Prerequisites
 
-## Jenkins Configuration
-1. **Add Jenkins Credentials**:
-   - Add the SonarQube token, AWS access key, and secret key in `Manage Jenkins → Credentials → System → Global credentials`.
-2. **Install Required Plugins**:
-   - Install plugins such as SonarQube Scanner, NodeJS, Docker, and Prometheus metrics under `Manage Jenkins → Plugins`.
+Before you begin, install the following on your system:
 
-3. **Global Tool Configuration**:
-   - Set up tools like JDK 17, SonarQube Scanner, NodeJS, and Docker under `Manage Jenkins → Global Tool Configuration`.
+### 🐳 Docker
 
-## Pipeline Overview
-### Pipeline Stages
-1. **Git Checkout**: Clones the source code from GitHub.
-2. **SonarQube Analysis**: Performs static code analysis.
-3. **Quality Gate**: Ensures code quality standards.
-4. **Install NPM Dependencies**: Installs NodeJS packages.
-5. **Trivy Security Scan**: Scans the project for vulnerabilities.
-6. **Docker Build**: Builds a Docker image for the project.
-7. **Push to AWS ECR**: Tags and pushes the Docker image to ECR.
-8. **Image Cleanup**: Deletes images from the Jenkins server to save space.
+```bash
+sudo apt update
+sudo apt install docker.io -y
+sudo systemctl enable docker
+sudo systemctl start docker
+docker --version
+```
 
-### Running Jenkins Pipeline
-Create and run the build pipeline in Jenkins. The pipeline will build, analyze, and push the project Docker image to ECR.
-Create a Jenkins pipeline by adding the following script:
+### 🧩 Docker Compose
 
-### Build Pipeline
+```bash
+sudo apt install docker-compose -y
+docker-compose --version
+```
+
+### 🧠 Git
+
+```bash
+sudo apt install git -y
+git --version
+```
+
+### 💻 Visual Studio Code (optional)
+
+```bash
+sudo snap install code --classic
+```
+
+---
+
+## 🏗️ Infrastructure Setup Using Docker Compose
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/Isma3elovic/DevSecOps-AmazionPrime-Clone.git
+cd DevSecOps-AmazionPrime-Clone
+code .   # optional: open project in VS Code
+```
+
+### 2️⃣ Run Docker Containers
+
+```bash
+docker-compose up -d
+```
+
+This command launches containers for **Jenkins** and **SonarQube**.
+
+---
+
+## 🔍 SonarQube Configuration
+
+1. **Login Credentials:**
+   Username → `admin`
+   Password → `admin`
+
+2. **Generate SonarQube Token:**
+   Navigate to:
+   `Administration → Security → Users → Tokens`
+
+   * Generate a new token.
+   * Save it for Jenkins integration.
+
+---
+
+## 🤖 Jenkins Configuration
+
+### 1️⃣ Add Jenkins Credentials
+
+Add the following credentials under:
+**Manage Jenkins → Credentials → System → Global credentials**
+
+* SonarQube Token
+* DockerHub Username & Password
+
+### 2️⃣ Install Required Plugins
+
+Go to **Manage Jenkins → Plugins** and install:
+
+* SonarQube Scanner
+* NodeJS
+* Docker
+* Prometheus Metrics
+
+### 3️⃣ Configure Global Tools
+
+In **Manage Jenkins → Global Tool Configuration**, set up:
+
+* JDK 17
+* NodeJS
+* SonarQube Scanner
+* Docker
+
+---
+
+## 🚀 CI/CD Pipeline Overview
+
+### 🧾 Pipeline Stages
+
+1. **Git Checkout** → Clone source code from GitHub
+2. **SonarQube Analysis** → Run static code analysis
+3. **Quality Gate** → Verify code quality thresholds
+4. **Install NPM Dependencies** → Install NodeJS packages
+5. **Trivy Security Scan** → Scan for vulnerabilities
+6. **Docker Build** → Build Docker image
+7. **Push to DockerHub** → Push image to registry
+8. **Image Cleanup** → Remove old images
+
+---
+
+## 🧱 Jenkins Build Pipeline Script
 
 ```groovy
 pipeline {
     agent any
-    
-    parameters {
-        string(name: 'ECR_REPO_NAME', defaultValue: 'amazon-prime', description: 'Enter repository name')
-        string(name: 'AWS_ACCOUNT_ID', defaultValue: '123456789012', description: 'Enter AWS Account ID') // Added missing quote
-    }
     
     tools {
         jdk 'JDK'
@@ -78,18 +149,19 @@ pipeline {
     
     environment {
         SCANNER_HOME = tool 'SonarQube Scanner'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
     }
     
     stages {
         stage('1. Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/pandacloud1/DevopsProject2.git'
+                git branch: 'main', url: 'https://github.com/Isma3elovic/DevSecOps-AmazionPrime-Clone.git'
             }
         }
         
         stage('2. SonarQube Analysis') {
             steps {
-                withSonarQubeEnv ('sonar-server') {
+                withSonarQubeEnv('sonar-server') {
                     sh """
                     $SCANNER_HOME/bin/sonar-scanner \
                     -Dsonar.projectName=amazon-prime \
@@ -101,8 +173,7 @@ pipeline {
         
         stage('3. Quality Gate') {
             steps {
-                waitForQualityGate abortPipeline: false, 
-                credentialsId: 'sonar-token'
+                waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
             }
         }
         
@@ -120,211 +191,75 @@ pipeline {
         
         stage('6. Build Docker Image') {
             steps {
-                sh "docker build -t ${params.ECR_REPO_NAME} ."
+                sh "docker build -t isma3elovic/amazon-prime:latest ."
             }
         }
         
-        stage('7. Create ECR repo') {
+        stage('7. Push Image to DockerHub') {
             steps {
-                withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'), 
-                                 string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh """
-                    aws configure set aws_access_key_id $AWS_ACCESS_KEY
-                    aws configure set aws_secret_access_key $AWS_SECRET_KEY
-                    aws ecr describe-repositories --repository-names ${params.ECR_REPO_NAME} --region us-east-1 || \
-                    aws ecr create-repository --repository-name ${params.ECR_REPO_NAME} --region us-east-1
+                    echo $PASS | docker login -u $USER --password-stdin
+                    docker push isma3elovic/amazon-prime:latest
                     """
                 }
             }
         }
         
-        stage('8. Login to ECR & tag image') {
+        stage('8. Cleanup Images') {
             steps {
-                withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'), 
-                                 string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
-                    sh """
-                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
-                    docker tag ${params.ECR_REPO_NAME} ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
-                    docker tag ${params.ECR_REPO_NAME} ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
-                    """
-                }
-            }
-        }
-        
-        stage('9. Push image to ECR') {
-            steps {
-                withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'), 
-                                 string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
-                    sh """
-                    docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
-                    docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
-                    """
-                }
-            }
-        }
-        
-        stage('10. Cleanup Images') {
-            steps {
-                sh """
-                docker rmi ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
-                docker rmi ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
-		docker images
-                """
+                sh "docker rmi isma3elovic/amazon-prime:latest || true"
             }
         }
     }
 }
 ```
 
-## Continuous Deployment with ArgoCD
-1. **Create EKS Cluster**: Use Terraform to create an EKS cluster and related resources.
-2. **Deploy Amazon Prime Clone**: Use ArgoCD to deploy the application using Kubernetes YAML files.
-3. **Monitoring Setup**: Install Prometheus and Grafana using Helm charts for monitoring the Kubernetes cluster.
+---
 
-### Deployment Pipeline
-```groovy
-pipeline {
-    agent any
+## 🚢 Continuous Deployment with ArgoCD
 
-    environment {
-        KUBECTL = '/usr/local/bin/kubectl'
-    }
+### 1️⃣ Install Minikube
 
-    parameters {
-        string(name: 'CLUSTER_NAME', defaultValue: 'amazon-prime-cluster', description: 'Enter your EKS cluster name')
-    }
-
-    stages {
-        stage("Login to EKS") {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'),
-                                     string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
-                        sh "aws eks --region us-east-1 update-kubeconfig --name ${params.CLUSTER_NAME}"
-                    }
-                }
-            }
-        }
-
-        stage("Configure Prometheus & Grafana") {
-            steps {
-                script {
-                    sh """
-                    helm repo add stable https://charts.helm.sh/stable || true
-                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
-                    # Check if namespace 'prometheus' exists
-                    if kubectl get namespace prometheus > /dev/null 2>&1; then
-                        # If namespace exists, upgrade the Helm release
-                        helm upgrade stable prometheus-community/kube-prometheus-stack -n prometheus
-                    else
-                        # If namespace does not exist, create it and install Helm release
-                        kubectl create namespace prometheus
-                        helm install stable prometheus-community/kube-prometheus-stack -n prometheus
-                    fi
-                    kubectl patch svc stable-kube-prometheus-sta-prometheus -n prometheus -p '{"spec": {"type": "LoadBalancer"}}'
-                    kubectl patch svc stable-grafana -n prometheus -p '{"spec": {"type": "LoadBalancer"}}'
-                    """
-                }
-            }
-        }
-
-        stage("Configure ArgoCD") {
-            steps {
-                script {
-                    sh """
-                    # Install ArgoCD
-                    kubectl create namespace argocd || true
-                    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-                    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-                    """
-                }
-            }
-        }
-		
-    }
-}
+```bash
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+minikube start
 ```
 
-## Cleanup
-- Run cleanup pipelines to delete the resources such as load balancers, services, and deployment files.
-- Use `terraform destroy` to remove the EKS cluster and other infrastructure.
+### 2️⃣ Install ArgoCD
 
-### Cleanup Pipeline
-```groovy
-pipeline {
-    agent any
-
-    environment {
-        KUBECTL = '/usr/local/bin/kubectl'
-    }
-
-    parameters {
-        string(name: 'CLUSTER_NAME', defaultValue: 'amazon-prime-cluster', description: 'Enter your EKS cluster name')
-    }
-
-    stages {
-
-        stage("Login to EKS") {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'),
-                                     string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
-                        sh "aws eks --region us-east-1 update-kubeconfig --name ${params.CLUSTER_NAME}"
-                    }
-                }
-            }
-        }
-        
-        stage('Cleanup K8s Resources') {
-            steps {
-                script {
-                    // Step 1: Delete services and deployments
-                    sh 'kubectl delete svc kubernetes || true'
-                    sh 'kubectl delete deploy pandacloud-app || true'
-                    sh 'kubectl delete svc pandacloud-app || true'
-
-                    // Step 2: Delete ArgoCD installation and namespace
-                    sh 'kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml || true'
-                    sh 'kubectl delete namespace argocd || true'
-
-                    // Step 3: List and uninstall Helm releases in prometheus namespace
-                    sh 'helm list -n prometheus || true'
-                    sh 'helm uninstall kube-stack -n prometheus || true'
-                    
-                    // Step 4: Delete prometheus namespace
-                    sh 'kubectl delete namespace prometheus || true'
-
-                    // Step 5: Remove Helm repositories
-                    sh 'helm repo remove stable || true'
-                    sh 'helm repo remove prometheus-community || true'
-                }
-            }
-        }
-		
-        stage('Delete ECR Repository and KMS Keys') {
-            steps {
-                script {
-                    // Step 1: Delete ECR Repository
-                    sh '''
-                    aws ecr delete-repository --repository-name amazon-prime --region us-east-1 --force
-                    '''
-
-                    // Step 2: Delete KMS Keys
-                    sh '''
-                    for key in $(aws kms list-keys --region us-east-1 --query "Keys[*].KeyId" --output text); do
-                        aws kms disable-key --key-id $key --region us-east-1
-                        aws kms schedule-key-deletion --key-id $key --pending-window-in-days 7 --region us-east-1
-                    done
-                    '''
-                }
-            }
-        }		
-		
-    }
-}
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
-## Additional Information
-For further details, refer to the word document containing a complete write-up of the project.
+### 3️⃣ Install Prometheus & Grafana
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+kubectl create namespace monitoring
+helm install monitor prometheus-community/kube-prometheus-stack -n monitoring
+```
+
+---
+
+## 🧹 Cleanup Resources
+
+To remove all resources and free up space:
+
+```bash
+kubectl delete namespace argocd --ignore-not-found
+kubectl delete namespace monitoring --ignore-not-found
+minikube delete
+docker system prune -af
+```
+
+---
+
+## 📄 Additional Information
+
+For a complete explanation of each component, refer to the project documentation included in this repository.
 
 ---
