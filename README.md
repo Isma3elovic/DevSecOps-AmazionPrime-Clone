@@ -1,55 +1,34 @@
 # Amazon Prime Clone Deployment Project
-![Pipeline Overview](./src/Overview.png)
 
 ## Project Overview
 This project demonstrates deploying an Amazon Prime clone using a set of DevOps tools and practices. The primary tools include:
 
-- **Terraform**: Infrastructure as Code (IaC) tool to create AWS infrastructure such as EC2 instances and EKS clusters.
 - **GitHub**: Source code management.
 - **Jenkins**: CI/CD automation tool.
 - **SonarQube**: Code quality analysis and quality gate tool.
 - **NPM**: Build tool for NodeJS.
 - **Aqua Trivy**: Security vulnerability scanner.
 - **Docker**: Containerization tool to create images.
-- **AWS ECR**: Repository to store Docker images.
-- **AWS EKS**: Container management platform.
+- **DockerHub**: Repository to store Docker images.
+- **Minikube**: Container management platform.
 - **ArgoCD**: Continuous deployment tool.
 - **Prometheus & Grafana**: Monitoring and alerting tools.
 
-## Pre-requisites
-1. **AWS Account**: Ensure you have an AWS account. [Create an AWS Account](https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-creating.html)
-2. **AWS CLI**: Install AWS CLI on your local machine. [AWS CLI Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-3. **VS Code (Optional)**: Download and install VS Code as a code editor. [VS Code Download](https://code.visualstudio.com/download)
-4. **Install Terraform in Windows**: Download and install Terraform in Windows [Terraform in Windows](https://learn.microsoft.com/en-us/azure/developer/terraform/get-started-windows-bash)
 
-## Configuration
-### AWS Setup
-1. **IAM User**: Create an IAM user and generate the access and secret keys to configure your machine with AWS.
-2. **Key Pair**: Create a key pair named `key` for accessing your EC2 instances.
 
-## Infrastructure Setup Using Terraform
+## Infrastructure Setup Using docker compose
 1. **Clone the Repository** (Open Command Prompt & run below):
    ```bash
-   git clone https://github.com/pandacloud1/DevopsProject2.git
-   cd DevopsProject2
+   git clone https://github.com/Isma3elovic/DevSecOps-AmazionPrime-Clone.git
+   cd DevSecOps-AmazionPrime-Clone
    code .   # this command will open VS code in backend
    ```
-2. **Initialize and Apply Terraform**:
-   - Run the below commands to reduce the path displayed in VS Code terminal (Optional)
-     ```bash
-     code $PROFILE
-     function prompt {"$PWD > "}
-     function prompt {$(Get-Location -Leaf) + " > "}
-     ```
-   - Open `terraform_code/ec2_server/main.tf` in VS Code.
-   - Run the following commands:
-     ```bash
-     aws configure
-     terraform init
-     terraform apply --auto-approve
+2. **Initialize and Apply docker containers**:
+   - Run the below commands 
+   -  `docker-compose up -d` 
      ```
 
-This will create the EC2 instance, security groups, and install necessary tools like Jenkins, Docker, SonarQube, etc.
+This will create the docker containers for jenkins and sonarqube.
 
 ## SonarQube Configuration
 1. **Login Credentials**: Use `admin` for both username and password.
