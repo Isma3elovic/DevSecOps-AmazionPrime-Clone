@@ -84,7 +84,7 @@ pipeline {
     kubectl apply -f $WORKSPACE/k8s_files/prime-svc.yaml -n $NAMESPACE
 
     kubectl rollout restart deployment amazon-prime -n $NAMESPACE
-    docker system prune 
+    docker system prune -y
     
 '''
 
