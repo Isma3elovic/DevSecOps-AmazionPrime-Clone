@@ -221,38 +221,77 @@ In Manage Jenkins → Global Tool Configuration, set up:
 
     Deploy in minikube cluster
 
+## 🧠 Prometheus & Grafana Configuration
+
+### 1. Verify Prometheus Service
+
+Check that Prometheus is running and note its service name:
+
+```bash
+kubectl get svc -n monitoring | grep prometheus
+```
+You should see something like:
+
+kube-prom-stack-kube-prome-prometheus   ClusterIP   10.96.96.138   <none>   9090/TCP,8080/TCP   29h
+
+    Service Name: kube-prom-stack-kube-prome-prometheus
+    Namespace: monitoring
+    Port: 9090
+
+2. Configure Grafana to Use Prometheus as a Data Source
+
+    Open Grafana in your browser.
+    Example (NodePort or Ingress):
+
+http://<grafana-url>:<port>
+
+Go to:
+Connections → Data Sources → Add data source → Prometheus
+
+Enter the following URL in the configuration:
+
+    http://kube-prom-stack-kube-prome-prometheus.monitoring.svc.cluster.local:9090
+
+    Click Save & Test
+
+If everything is correct, you should see:
+
+    ✅ Data source is working
+
+
 🚢 Continuous Deployment with ArgoCD
 
 1️⃣ Install Minikube
 
-Bash
+```
 
 curl -LO [https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64](https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64)
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
 minikube start
-
+```
 2️⃣ Install ArgoCD
 
-Bash
 
+```
 kubectl create namespace argocd
 kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-
+```
 3️⃣ Install Prometheus & Grafana
 
-Bash
 
+```
 helm repo add prometheus-community [https://prometheus-community.github.io/helm-charts](https://prometheus-community.github.io/helm-charts)
 kubectl create namespace monitoring
 helm install monitor prometheus-community/kube-prometheus-stack -n monitoring
-
+```
 🧹 Cleanup Resources
 
 To remove all resources and free up space:
-Bash
+```
 
 kubectl delete namespace argocd --ignore-not-found
 kubectl delete namespace monitoring --ignore-not-found
 minikube delete
 docker system prune -af
+```
