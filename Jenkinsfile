@@ -68,7 +68,7 @@ pipeline {
         stage('10. Deploy Application & Ingress') {
             steps {
                 script{
-                sh '''
+                sh '''           
     export KUBECONFIG=$KUBE_CONFIG
 
     NAMESPACE=$(grep 'namespace:' $WORKSPACE/k8s_files/deployment.yaml | awk '{print $2}')
@@ -84,7 +84,7 @@ pipeline {
     kubectl apply -f $WORKSPACE/k8s_files/prime-svc.yaml -n $NAMESPACE
 
     kubectl rollout restart deployment amazon-prime -n $NAMESPACE
-
+    docker system prune 
     
 '''
 
