@@ -232,7 +232,7 @@ kubectl get svc -n monitoring | grep prometheus
 ```
 You should see something like:
 
-kube-prom-stack-kube-prome-prometheus   ClusterIP   10.96.96.138   <none>   9090/TCP,8080/TCP   29h
+kube-prom-stack-kube-prome-prometheus   ClusterIP   10.96.96.138   <none>   9090/TCP,8080/TCP   
 
     Service Name: kube-prom-stack-kube-prome-prometheus
     Namespace: monitoring
@@ -251,7 +251,7 @@ Connections → Data Sources → Add data source → Prometheus
 Enter the following URL in the configuration:
 
     http://kube-prom-stack-kube-prome-prometheus.monitoring.svc.cluster.local:9090
-
+``
     Click Save & Test
 
 If everything is correct, you should see:
